@@ -1,7 +1,7 @@
 #include "procstat.h"
 #include <stdio.h>
 
-pstat_ret_t read_procstat(char* outbuf, size_t* size) { 
+pstat_ret_t read_procstat(char* outbuf, size_t size) { 
     FILE* procstat = fopen("/proc/stat", "r");
 
     if (procstat == NULL || outbuf == NULL)
@@ -10,7 +10,8 @@ pstat_ret_t read_procstat(char* outbuf, size_t* size) {
     fflush(procstat);
  
     char* read_ptr = outbuf;
-    size_t bytes_to_read = *size; 
+    /* reserve one byte for NULL byte at the end of a string */
+    size_t bytes_to_read = size - 1; 
     pstat_ret_t retval = SUCCESS; 
 
     while(!feof(procstat) && (bytes_to_read != 0)) {
@@ -21,13 +22,11 @@ pstat_ret_t read_procstat(char* outbuf, size_t* size) {
             break;
         }
 
-        if(bytes_read != bytes_to_read) {
-            read_ptr += bytes_read;
-        }
+        read_ptr += bytes_read;
         bytes_to_read -= bytes_read;
     }
-     
-    *size -= bytes_to_read;
+
+    *read_ptr = '\0';
 
     fclose(procstat);
 
