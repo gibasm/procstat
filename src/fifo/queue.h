@@ -13,7 +13,7 @@ typedef struct {
     pthread_mutex_t lock;
     queue_state_t state;
     size_t first_pos, last_pos;
-    size_t length, elem_size;
+    size_t length;
     void** data;
 } queue_t;
 
@@ -28,7 +28,7 @@ typedef struct {
  * 
  * @return queue_t initialized queue object
  */
-queue_t queue_init(size_t length, size_t elem_size, void** buffer);
+queue_t queue_init(size_t length);
 
 /**
  * @brief push an element pointed to by "elem" to the queue
@@ -39,15 +39,29 @@ queue_t queue_init(size_t length, size_t elem_size, void** buffer);
  *
  * @return int upon success returns QUEUE_SUCCESS, otherwise QUEUE_FULL
  */
-int queue_push(queue_t* queue, void* elem); 
+int queue_push(queue_t* queue, void* elem, size_t size); 
 
 /**
- * @brief pop an element from the queue and copy it to a buffer pointed by "elem"
+ * @brief pop an element from the queue
  *
  * @param queue queue pointer 
  *
- * @param elem pointer to a buffer for the popped element 
- *
  * @return int upon success returns QUEUE_SUCCESS, otherwise QUEUE_EMPTY
  */
-int queue_pop(queue_t* queue, void* elem);
+int queue_pop(queue_t* queue);
+
+/**
+ * @brief read the first element in the queue
+ *
+ * @param queue queue pointer
+ *
+ * @return void* a pointer to the first element in the queue
+ */
+void* queue_get_first(queue_t* queue);
+
+/**
+ * @brief free the memory allocated for the queue
+ * 
+ * @oaram queu queue pointer
+ */
+void queue_free(queue_t* queue);

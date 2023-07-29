@@ -1,5 +1,6 @@
 #include "queue.h"
 #include <memory.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include <stdio.h>
 
@@ -9,16 +10,19 @@
 
 #define FIRST(queue) (queue->data[queue->first_pos])
 
-
-queue_t queue_init(size_t length, size_t elem_size, void** buffer) {
+queue_t queue_init(size_t length) {
     queue_t queue = {
         .state = QUEUE_EMPTY,
         .last_pos = 0,
         .first_pos = 0,
         .length = length,
-        .elem_size = elem_size,
-        .data = buffer
     };
+ 
+    queue.data = (void**)calloc(length, sizeof(void*));
+
+    for(size_t i = 0; i < queue.length; ++i) {
+        queue.data[i] = NULL;
+    }
 
     pthread_mutex_init(&queue.lock, NULL);
 
@@ -26,15 +30,21 @@ queue_t queue_init(size_t length, size_t elem_size, void** buffer) {
 }
 
 
-int queue_push(queue_t* queue, void* elem) {
+int queue_push(queue_t* queue, void* elem, size_t size) {
     pthread_mutex_lock(&queue->lock);
 
     if(queue->state == QUEUE_FULL) {
         pthread_mutex_unlock(&queue->lock);
         return QUEUE_FULL;
+    } 
+    
+    if(LAST(queue) != NULL) {
+        free(LAST(queue));
     }
 
-    memcpy(LAST(queue), elem, queue->elem_size); 
+    LAST(queue) = malloc(size);
+
+    memcpy(LAST(queue), elem, size); 
     queue->last_pos = NEXTPOS(queue->last_pos, queue->length);
 
     queue->state = queue->first_pos == queue->last_pos ? QUEUE_FULL : QUEUE_NONEMPTY;
@@ -45,7 +55,7 @@ int queue_push(queue_t* queue, void* elem) {
 }
 
 
-int queue_pop(queue_t* queue, void* elem) {
+int queue_pop(queue_t* queue) {
     pthread_mutex_lock(&queue->lock);
 
     if(queue->state == QUEUE_EMPTY) {
@@ -53,7 +63,6 @@ int queue_pop(queue_t* queue, void* elem) {
         return QUEUE_EMPTY;
     }
 
-    memcpy(elem, FIRST(queue), queue->elem_size);
     queue->first_pos = NEXTPOS(queue->first_pos, queue->length);
 
     queue->state = queue->first_pos == queue->last_pos ? QUEUE_EMPTY : QUEUE_NONEMPTY;
@@ -63,3 +72,16 @@ int queue_pop(queue_t* queue, void* elem) {
     return QUEUE_SUCCESS;
 }
 
+void* queue_get_first(queue_t* queue) {
+    return FIRST(queue); 
+}
+
+void queue_free(queue_t* queue) {
+    for(size_t i = 0; i < queue->length; ++i) {
+        if(queue->data[i] != NULL)
+            free(queue->data[i]);
+    }
+    free(queue->data);
+
+    pthread_mutex_destroy(&queue->lock);
+}
