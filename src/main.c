@@ -11,16 +11,18 @@ queue_t raw_pstat_fifo;
 int main(void) {          
     raw_pstat_fifo = queue_init(READER_FIFO_LEN);
 
+    pthread_t reader_thread;  
     reader_args_t reader_args = {
-        .strbuf_len = 256UL
+        .done = false
     };
 
-    pthread_t reader_thread;  
-    if(pthread_create(&reader_thread, NULL, pstat_reader_start, (void*)&reader_args) != 0) {
+    if(pthread_create(&reader_thread, NULL, pstat_reader_start, &reader_args) != 0) {
         return 1;
     }
 
-    pthread_cancel(reader_thread);
+    reader_args.done = true;
+
+    pthread_join(reader_thread, NULL);
    
     queue_free(&raw_pstat_fifo);    
 

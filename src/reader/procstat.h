@@ -8,9 +8,9 @@ typedef enum {
 } pstat_ret_t;
 
 /**
- * @brief read maximum of "size" characters from "/proc/stat" to "outbuf" as a null terminated string
+ * @brief read all of the characters from "/proc/stat" to "outbuf" as a null terminated string
  *
  * @return pstat_ret_t returns FAILED when reading fails, otherwise SUCCESS
  * */
-pstat_ret_t read_procstat(char* outbuf, size_t size);
+pstat_ret_t read_procstat(char** outbuf);
 

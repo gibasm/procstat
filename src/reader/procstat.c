@@ -1,34 +1,43 @@
 #include "procstat.h"
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
-pstat_ret_t read_procstat(char* outbuf, size_t size) { 
+#define CHUNK_SIZE 256UL
+
+pstat_ret_t read_procstat(char** outbuf) { 
     FILE* procstat = fopen("/proc/stat", "r");
 
-    if (procstat == NULL || outbuf == NULL)
+    if (procstat == NULL)
         return FAILED;
 
     fflush(procstat);
  
-    char* read_ptr = outbuf;
-    /* reserve one byte for NULL byte at the end of a string */
-    size_t bytes_to_read = size - 1; 
-    pstat_ret_t retval = SUCCESS; 
+    char chunk_buf[CHUNK_SIZE];
+    size_t length = 0;
 
-    while(!feof(procstat) && (bytes_to_read != 0)) {
-        size_t bytes_read = fread(read_ptr, 1UL, bytes_to_read, procstat);
+    while(!feof(procstat)) {
+        size_t bytes_read = fread(chunk_buf, 1UL, CHUNK_SIZE, procstat);
+
+        if(bytes_read == 0)
+            continue;
+
+        length += bytes_read;
 
         if(ferror(procstat)) {
-            retval = FAILED;
-            break;
+            fclose(procstat);
+            return FAILED;
         }
-
-        read_ptr += bytes_read;
-        bytes_to_read -= bytes_read;
+      
+        *outbuf = realloc(*outbuf, length);
+        
+        memcpy(*outbuf + (length - bytes_read), (const char*)chunk_buf, bytes_read); 
     }
 
-    *read_ptr = '\0';
-
+    *outbuf = realloc(*outbuf, length + 1);
+    memset(*outbuf + length, 0, 1UL); // null terminate the string
+    
     fclose(procstat);
 
-    return retval;
+    return SUCCESS;
 }
