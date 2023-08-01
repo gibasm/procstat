@@ -8,7 +8,7 @@ void read_procstat_should_read_nonempty_string() {
 
     pstat_ret_t result = read_procstat(&strbuf);
 
-    assert(result == SUCCESS);
+    assert(result == PSTAT_SUCCESS);
     assert(strlen((const char*)strbuf) != 0);
 
     free(strbuf);

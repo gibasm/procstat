@@ -9,7 +9,7 @@ pstat_ret_t read_procstat(char** outbuf) {
     FILE* procstat = fopen("/proc/stat", "r");
 
     if (procstat == NULL)
-        return FAILED;
+        return PSTAT_FAILED;
 
     fflush(procstat);
  
@@ -26,7 +26,7 @@ pstat_ret_t read_procstat(char** outbuf) {
 
         if(ferror(procstat)) {
             fclose(procstat);
-            return FAILED;
+            return PSTAT_FAILED;
         }
       
         *outbuf = realloc(*outbuf, length);
@@ -39,5 +39,5 @@ pstat_ret_t read_procstat(char** outbuf) {
     
     fclose(procstat);
 
-    return SUCCESS;
+    return PSTAT_SUCCESS;
 }

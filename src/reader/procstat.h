@@ -3,8 +3,8 @@
 #include <stddef.h>
 
 typedef enum {
-    SUCCESS = 0,
-    FAILED = 1
+    PSTAT_SUCCESS = 0,
+    PSTAT_FAILED = 1
 } pstat_ret_t;
 
 /**
