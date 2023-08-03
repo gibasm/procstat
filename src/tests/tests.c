@@ -1,5 +1,6 @@
 #include "procstat_test.h"
 #include "queue_test.h"
+#include "parser_test.h"
 #include <stdio.h>
 
 int main(void)
@@ -9,6 +10,8 @@ int main(void)
     queue_pop_should_return_success_when_nonempty();
     queue_push_should_return_queue_full_when_full();
     queue_pop_should_return_queue_empty_when_empty();
+    parser_should_successfully_parse_a_valid_string();
+    parser_should_fail_when_parsing_an_invalid_string();
     printf("--- All tests passed ---\n\r");
     return 0;
 }
