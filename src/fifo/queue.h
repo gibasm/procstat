@@ -62,6 +62,19 @@ void* queue_get_first(queue_t* queue);
 /**
  * @brief free the memory allocated for the queue
  * 
- * @oaram queu queue pointer
+ * @param queu queue pointer
  */
 void queue_free(queue_t* queue);
+
+/**
+ * @brief copy the "buffer_size" bytes from the first element of the queue to the "buffer", then pop the queue 
+ *
+ * @param queue queue pointer
+ *
+ * @param buffer buffer to copy to
+ *
+ * @param buffer_size size of the buffer to be copied to
+ *
+ * @return int unon success returns QUEUE_SUCCESS, otherwise QUEUE_EMPTY
+ */
+int queue_copy_first_and_pop(queue_t* queue, void* buffer, size_t buffer_size);

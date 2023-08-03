@@ -85,3 +85,23 @@ void queue_free(queue_t* queue) {
 
     pthread_mutex_destroy(&queue->lock);
 }
+
+int queue_copy_first_and_pop(queue_t* queue, void* buffer, size_t buffer_size) {
+    pthread_mutex_lock(&queue->lock);
+
+    if(queue->state == QUEUE_EMPTY) {
+        pthread_mutex_unlock(&queue->lock);
+        return QUEUE_EMPTY;
+    }
+
+    memcpy(buffer, (const void*)FIRST(queue), buffer_size);
+
+    queue->first_pos = NEXTPOS(queue->first_pos, queue->length);
+
+    queue->state = queue->first_pos == queue->last_pos ? QUEUE_EMPTY : QUEUE_NONEMPTY;
+
+    pthread_mutex_unlock(&queue->lock);
+
+    return QUEUE_SUCCESS;
+}
+
