@@ -1,9 +1,11 @@
 #include "reader.h"
 #include "procstat.h"
+#include "config.h"
 #include <string.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <signal.h>
+#include <unistd.h>
 
 void* pstat_reader_start(void* arg) { 
     sigset_t sigmask;
@@ -25,6 +27,7 @@ void* pstat_reader_start(void* arg) {
 
         free(pstat_rawstr);
         pstat_rawstr = NULL;
+        usleep(READER_DELAY_US);
     }
 
     return NULL;

@@ -1,0 +1,4 @@
+#pragma once 
+
+#define READER_DELAY_US 10000UL
+#define PRINTER_DELAY_US 250000UL
