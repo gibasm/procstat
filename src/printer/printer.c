@@ -32,7 +32,7 @@ void* pstat_printer_start(void* arg) {
         }
    
 
-        printf("overall\t[%3.1f%%]\n", usage);
+        printf("overall\t[%5.1f%%]\n", usage);
         
         for(size_t ncpu = 1; ncpu < n_cpus; ++ncpu) {
 
@@ -41,7 +41,7 @@ void* pstat_printer_start(void* arg) {
                     break;
             }
 
-            printf("cpu%zu\t[%3.1f%%]\n", ncpu-1UL, usage);
+            printf("cpu%zu\t[%5.1f%%]\n", ncpu-1UL, usage);
         }
 
         usleep(PRINTER_DELAY_US);
